@@ -1,5 +1,7 @@
 # very_tiny_state_machine
 
+[![Build Status](https://travis-ci.org/WeTransfer/very_tiny_state_machine.svg?branch=master)](https://travis-ci.org/WeTransfer/very_tiny_state_machine)
+
 For when the others are not tiny enough.
 
 The entire state machine lives in a separate variable, and does not pollute the class or the module of the caller.
