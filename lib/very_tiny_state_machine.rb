@@ -148,11 +148,13 @@ class VeryTinyStateMachine
     raise UnknownState, new_state.inspect unless known?(new_state)
     if may_transition_to?(new_state)
       @mutex.synchronize do
-        dispatch_callbacks_before_transition(new_state)
+        dispatch_callbacks_before_transition(new_state) if @callbacks_via
+        
         previous = @state
         @state = new_state.to_sym
         @flow << new_state.to_sym
-        dispatch_callbacks_after_transition(previous)
+        
+        dispatch_callbacks_after_transition(previous) if @callbacks_via
         previous
       end
     else
