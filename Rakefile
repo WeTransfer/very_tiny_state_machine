@@ -14,6 +14,7 @@ require_relative 'lib/very_tiny_state_machine'
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://guides.rubygems.org/specification-reference/ for more options
+  gem.version = VeryTinyStateMachine::VERSION
   gem.name = "very_tiny_state_machine"
   gem.homepage = "http://github.com/WeTransfer/very_tiny_state_machine"
   gem.license = "MIT"
