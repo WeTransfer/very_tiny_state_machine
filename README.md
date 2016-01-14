@@ -12,7 +12,7 @@ are dispatched to the given object as messages.
     @automaton.permit_transition :closing => :closed
     
     # Then, lower down the code
-    @automaton.transition! :processing
+    @automaton.transition! :processing 
 
 The object supplied as the optional second argument will receive messages when states are switched around,
 in the following order (using the state machine from the previous example):
