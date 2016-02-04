@@ -1,4 +1,3 @@
-require 'thread'
 require 'set'
 
 # A mini state machine object that can be used to track a state flow.
@@ -33,7 +32,7 @@ require 'set'
 #     @automaton.in_state?(:processing) #=> true
 #     @automaton.in_state?(:initialized) #=> false
 class VeryTinyStateMachine
-  VERSION = '1.0.0'
+  VERSION = '2.0.0'
   
   InvalidFlow = Class.new(StandardError) # Gets raised when an impossible transition gets requested
   UnknownState = Class.new(StandardError) # Gets raised when an unknown state gets requested
@@ -43,7 +42,6 @@ class VeryTinyStateMachine
   # @param initial_state[#to_sym] the initial state of the state machine
   # @param object_handling_callbacks[#send, #respond_to?] the callback handler that will receive transition notifications
   def initialize(initial_state, object_handling_callbacks = nil)
-    @mutex = Mutex.new
     @state = initial_state.to_sym
     @flow = [@state]
     @permitted_states = Set.new([initial_state])
@@ -147,16 +145,14 @@ class VeryTinyStateMachine
     
     raise UnknownState, new_state.inspect unless known?(new_state)
     if may_transition_to?(new_state)
-      @mutex.synchronize do
-        dispatch_callbacks_before_transition(new_state) if @callbacks_via
-        
-        previous = @state
-        @state = new_state.to_sym
-        @flow << new_state.to_sym
-        
-        dispatch_callbacks_after_transition(previous) if @callbacks_via
-        previous
-      end
+      dispatch_callbacks_before_transition(new_state) if @callbacks_via
+      
+      previous = @state
+      @state = new_state.to_sym
+      @flow << new_state.to_sym
+      
+      dispatch_callbacks_after_transition(previous) if @callbacks_via
+      previous
     else
       raise InvalidFlow, 
         "Cannot change states from #{@state} to #{new_state} (flow so far: #{@flow.join(' > ')})"
