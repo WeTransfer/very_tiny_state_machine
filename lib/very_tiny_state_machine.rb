@@ -32,7 +32,7 @@ require 'set'
 #     @automaton.in_state?(:processing) #=> true
 #     @automaton.in_state?(:initialized) #=> false
 class VeryTinyStateMachine
-  VERSION = '2.0.0'
+  VERSION = '2.1.0'
   
   InvalidFlow = Class.new(StandardError) # Gets raised when an impossible transition gets requested
   UnknownState = Class.new(StandardError) # Gets raised when an unknown state gets requested
@@ -194,10 +194,19 @@ class VeryTinyStateMachine
     if @callbacks_via.respond_to?("after_entering_#{to}_state", also_protected_and_private=true)
       @callbacks_via.send("after_entering_#{to}_state")
     end
+    
+    if @callbacks_via.respond_to?(:after_every_transition, also_protected_and_private=true)
+      @callbacks_via.send(:after_every_transition, from, to)
+    end
   end
   
   def dispatch_callbacks_before_transition(to)
     from = @state
+    
+    if @callbacks_via.respond_to?(:before_every_transition, also_protected_and_private=true)
+      @callbacks_via.send(:before_every_transition, from, to)
+    end
+    
     if @callbacks_via.respond_to?("leaving_#{from}_state", also_protected_and_private=true)
       @callbacks_via.send("leaving_#{from}_state")
     end

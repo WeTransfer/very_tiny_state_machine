@@ -127,13 +127,15 @@ describe VeryTinyStateMachine do
       machine.permit_state :running, :stopped
       machine.permit_transition :started => :running, :running => :stopped, :stopped => :started
       
+      expect(fake_acceptor).to receive(:before_every_transition).with(:started, :running)
       expect(fake_acceptor).to receive(:leaving_started_state)
       expect(fake_acceptor).to receive(:entering_running_state)
       expect(fake_acceptor).to receive(:transitioning_from_started_to_running)
       expect(fake_acceptor).to receive(:after_transitioning_from_started_to_running_state)
       expect(fake_acceptor).to receive(:after_leaving_started_state)
       expect(fake_acceptor).to receive(:after_entering_running_state)
-      
+      expect(fake_acceptor).to receive(:after_every_transition).with(:started, :running)
+
       machine.transition! :running
     end
     
