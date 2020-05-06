@@ -11,53 +11,24 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Julik Tarkhanov"]
-  s.date = "2016-11-01"
   s.description = "You wouldn't beleive how tiny it is"
   s.email = "me@julik.nl"
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.md"
   ]
-  s.files = [
-    ".document",
-    ".rspec",
-    ".travis.yml",
-    "Gemfile",
-    "LICENSE.txt",
-    "README.md",
-    "Rakefile",
-    "lib/very_tiny_state_machine.rb",
-    "spec/spec_helper.rb",
-    "spec/very_tiny_state_machine_spec.rb",
-    "very_tiny_state_machine.gemspec"
-  ]
+  s.files = `git ls-files -z`.split("\x0")
   s.homepage = "http://github.com/WeTransfer/very_tiny_state_machine"
   s.licenses = ["MIT"]
   s.rubygems_version = "2.4.5.1"
   s.summary = "A minuscule state machine for storing state of interesting objects"
 
-  if s.respond_to? :specification_version then
-    s.specification_version = 4
-
-    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<rspec>, ["~> 3.2.0"])
-      s.add_development_dependency(%q<rdoc>, ["~> 3.12"])
-      s.add_development_dependency(%q<bundler>, ["~> 1.0"])
-      s.add_development_dependency(%q<jeweler>, ["~> 2.0.1"])
-      s.add_development_dependency(%q<simplecov>, ["~> 0.10"])
-    else
-      s.add_dependency(%q<rspec>, ["~> 3.2.0"])
-      s.add_dependency(%q<rdoc>, ["~> 3.12"])
-      s.add_dependency(%q<bundler>, ["~> 1.0"])
-      s.add_dependency(%q<jeweler>, ["~> 2.0.1"])
-      s.add_dependency(%q<simplecov>, ["~> 0.10"])
-    end
-  else
-    s.add_dependency(%q<rspec>, ["~> 3.2.0"])
-    s.add_dependency(%q<rdoc>, ["~> 3.12"])
-    s.add_dependency(%q<bundler>, ["~> 1.0"])
-    s.add_dependency(%q<jeweler>, ["~> 2.0.1"])
-    s.add_dependency(%q<simplecov>, ["~> 0.10"])
-  end
+  s.specification_version = 4
+  s.add_development_dependency('rspec', ["~> 3.2.0"])
+  s.add_development_dependency('rdoc', ["~> 3.12"])
+  s.add_development_dependency('bundler')
+  s.add_development_dependency('rake', '~> 10')
+  s.add_development_dependency('yard')
+  s.add_development_dependency('simplecov', ["~> 0.10"])
+  s.add_development_dependency('wetransfer_style', '0.6.5')
 end
-
