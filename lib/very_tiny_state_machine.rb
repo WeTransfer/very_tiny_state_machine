@@ -64,6 +64,16 @@ class VeryTinyStateMachine
 
   # Permit states and transitions between them, all in one call
   #
+  #    m.permit_states_and_transitions(:created => [:rejected, :accepted])
+  #
+  # Be careful with hash key shadowing. This call:
+  #
+  #    m.permit_states_and_transitions(:created => :rejected, :created => :accepted)
+  #
+  # will not do what you expect - the last keyword argument will shadow the
+  # first one and thus only the {:created => :accepted} transition - and only
+  # the [:created, :accepted] states will end up being registered.
+  #
   # @param **states_to_states [Hash] a mapping from one state the machine may go into and one or multiple states that can be reached from that state
   # @return self
   def permit_states_and_transitions(**initial_states_to_destination_states)
