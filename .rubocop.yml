@@ -1,0 +1,10 @@
+inherit_gem:
+  wetransfer_style: ruby/default.yml
+AllCops:
+  TargetRubyVersion: 2.1
+Style/GuardClause:
+  Enabled: false
+Style/GuardClause:
+  Enabled: false
+Metrics/LineLength:
+  Enabled: false

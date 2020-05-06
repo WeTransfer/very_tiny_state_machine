@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'set'
 
 # A mini state machine object that can be used to track a state flow.
@@ -11,13 +13,13 @@ require 'set'
 #     @automaton.permit_state :processing, :closing, :closed
 #     @automaton.permit_transition :initialized => :processing, :processing => :closing
 #     @automaton.permit_transition :closing => :closed
-#    
+#
 #     # Then, lower down the code
 #     @automaton.transition! :processing
-#     
+#
 #     # This switches the internal state of the machine, and dispatches the following method
 #     # calls on the object given as the second argument to the constructor, in the following order:
-#    
+#
 #     # self.leaving_initialized_state
 #     # self.entering_processing_state
 #     # self.transitioning_from_initialized_to_processing_state
@@ -28,15 +30,15 @@ require 'set'
 #
 #     @automaton.transition :initialized # Will raise TinyStateMachine::InvalidFlow
 #     @automaton.transition :something_odd # Will raise TinyStateMachine::UnknownState
-#     
+#
 #     @automaton.in_state?(:processing) #=> true
 #     @automaton.in_state?(:initialized) #=> false
 class VeryTinyStateMachine
   VERSION = '2.1.0'
-  
+  INCLUDE_PRIVATES = true
   InvalidFlow = Class.new(StandardError) # Gets raised when an impossible transition gets requested
   UnknownState = Class.new(StandardError) # Gets raised when an unknown state gets requested
-  
+
   # Initialize a new TinyStateMachine, with the initial state and the object that will receive callbacks.
   #
   # @param initial_state[#to_sym] the initial state of the state machine
@@ -48,7 +50,7 @@ class VeryTinyStateMachine
     @permitted_transitions = Set.new
     @callbacks_via = object_handling_callbacks
   end
-  
+
   # Permit a single state or multiple states
   #
   # @param states [Array] states to permit
@@ -59,7 +61,7 @@ class VeryTinyStateMachine
     @permitted_states += states_to_permit
     will_be_added
   end
-  
+
   # Permit a transition from one state to another. If you need to add multiple transitions
   # from the same state, just call the method multiple times:
   #
@@ -70,16 +72,17 @@ class VeryTinyStateMachine
   # @return [Array] the list of states added to permitted states
   def permit_transition(from_to_hash)
     transitions_to_permit = Set.new
-    from_to_hash.each_pair do | from_state, to_state |
+    from_to_hash.each_pair do |from_state, to_state|
       raise UnknownState, from_state unless @permitted_states.include?(from_state.to_sym)
       raise UnknownState, to_state unless @permitted_states.include?(to_state.to_sym)
-      transitions_to_permit << {from_state.to_sym => to_state.to_sym}
+
+      transitions_to_permit << { from_state.to_sym => to_state.to_sym }
     end
     additions = transitions_to_permit - @permitted_transitions
     @permitted_transitions += transitions_to_permit
     additions
   end
-  
+
   # Tells whether the state is known to this state machine
   #
   # @param state[Symbol,String] the state to check for
@@ -87,17 +90,17 @@ class VeryTinyStateMachine
   def known?(state)
     @permitted_states.include?(state.to_sym)
   end
-  
+
   # Tells whether a transition is permitted to the given state.
   #
   # @param to_state[Symbol,String] state to transition to
   # @return [Boolean] whether the state can be transitioned to
   def may_transition_to?(to_state)
     to_state = to_state.to_sym
-    transition = {@state => to_state.to_sym}
+    transition = { @state => to_state.to_sym }
     @permitted_states.include?(to_state) && @permitted_transitions.include?(transition)
   end
-  
+
   # Tells whether the state machine is in a given state at the moment
   #
   # @param requisite_state [Symbol,String] name of the state to check for
@@ -105,7 +108,7 @@ class VeryTinyStateMachine
   def in_state?(requisite_state)
     @state == requisite_state.to_sym
   end
-  
+
   # Ensure the machine is in a given state, and if it isn't raise an InvalidFlow
   #
   # @param requisite_state[#to_sym] the state to verify
@@ -115,6 +118,7 @@ class VeryTinyStateMachine
     unless requisite_state.to_sym == @state
       raise InvalidFlow, "Must be in #{requisite_state.inspect} state, but was in #{@state.inspect}"
     end
+
     true
   end
 
@@ -123,7 +127,7 @@ class VeryTinyStateMachine
   # be raised if you did not permit this transition explicitly. If you want to transition to a state OR
   # stay in it if it is already active use {TinyStateMachine#transition_or_maintain!}
   #
-  # 
+  #
   # During transitions the before callbacks will be called on the @callbacks_via instance variable. If you are
   # transitioning from "initialized" to "processing" for instance, the following callbacks will be dispatched:
   #
@@ -142,23 +146,24 @@ class VeryTinyStateMachine
   # @raise InvalidFlow
   def transition!(new_state)
     new_state = new_state.to_sym
-    
+
     raise UnknownState, new_state.inspect unless known?(new_state)
+
     if may_transition_to?(new_state)
       dispatch_callbacks_before_transition(new_state) if @callbacks_via
-      
+
       previous = @state
       @state = new_state.to_sym
       @flow << new_state.to_sym
-      
+
       dispatch_callbacks_after_transition(previous) if @callbacks_via
       previous
     else
-      raise InvalidFlow, 
-        "Cannot change states from #{@state} to #{new_state} (flow so far: #{@flow.join(' > ')})"
+      raise InvalidFlow,
+            "Cannot change states from #{@state} to #{new_state} (flow so far: #{@flow.join(' > ')})"
     end
   end
-  
+
   # Transition to a given state. If the machine already is in that state, do nothing.
   # If the transition has to happen (the requested state is different than the current)
   # transition! will be called instead.
@@ -169,53 +174,54 @@ class VeryTinyStateMachine
   # @return [void]
   def transition_or_maintain!(new_state)
     return if in_state?(new_state)
+
     transition! new_state
   end
-  
+
   # Returns the flow of the transitions the machine went through so far
   #
   # @return [Array] the array of states
   def flow_so_far
     @flow.dup
   end
-  
+
   private
-  
+
   def dispatch_callbacks_after_transition(from)
     to = @state
-    if @callbacks_via.respond_to?("after_transitioning_from_#{from}_to_#{to}_state", also_protected_and_private=true)
+    if @callbacks_via.respond_to?("after_transitioning_from_#{from}_to_#{to}_state", INCLUDE_PRIVATES)
       @callbacks_via.send("after_transitioning_from_#{from}_to_#{to}_state")
     end
-    
-    if @callbacks_via.respond_to?("after_leaving_#{from}_state", also_protected_and_private=true)
+
+    if @callbacks_via.respond_to?("after_leaving_#{from}_state", INCLUDE_PRIVATES)
       @callbacks_via.send("after_leaving_#{from}_state")
     end
-    
-    if @callbacks_via.respond_to?("after_entering_#{to}_state", also_protected_and_private=true)
+
+    if @callbacks_via.respond_to?("after_entering_#{to}_state", INCLUDE_PRIVATES)
       @callbacks_via.send("after_entering_#{to}_state")
     end
-    
-    if @callbacks_via.respond_to?(:after_every_transition, also_protected_and_private=true)
+
+    if @callbacks_via.respond_to?(:after_every_transition, INCLUDE_PRIVATES)
       @callbacks_via.send(:after_every_transition, from, to)
     end
   end
-  
+
   def dispatch_callbacks_before_transition(to)
     from = @state
-    
-    if @callbacks_via.respond_to?(:before_every_transition, also_protected_and_private=true)
+
+    if @callbacks_via.respond_to?(:before_every_transition, INCLUDE_PRIVATES)
       @callbacks_via.send(:before_every_transition, from, to)
     end
-    
-    if @callbacks_via.respond_to?("leaving_#{from}_state", also_protected_and_private=true)
+
+    if @callbacks_via.respond_to?("leaving_#{from}_state", INCLUDE_PRIVATES)
       @callbacks_via.send("leaving_#{from}_state")
     end
-    
-    if @callbacks_via.respond_to?("entering_#{to}_state", also_protected_and_private=true)
+
+    if @callbacks_via.respond_to?("entering_#{to}_state", INCLUDE_PRIVATES)
       @callbacks_via.send("entering_#{to}_state")
     end
-    
-    if @callbacks_via.respond_to?("transitioning_from_#{from}_to_#{to}", also_protected_and_private=true)
+
+    if @callbacks_via.respond_to?("transitioning_from_#{from}_to_#{to}", INCLUDE_PRIVATES)
       @callbacks_via.send("transitioning_from_#{from}_to_#{to}")
     end
   end
