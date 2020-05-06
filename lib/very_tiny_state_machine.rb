@@ -34,7 +34,7 @@ require 'set'
 #     @automaton.in_state?(:processing) #=> true
 #     @automaton.in_state?(:initialized) #=> false
 class VeryTinyStateMachine
-  VERSION = '2.1.0'
+  VERSION = '2.1.1'
   INCLUDE_PRIVATES = true
   InvalidFlow = Class.new(StandardError) # Gets raised when an impossible transition gets requested
   UnknownState = Class.new(StandardError) # Gets raised when an unknown state gets requested
