@@ -9,9 +9,9 @@ The state machine has the ability to dispatch callbacks when states are switched
 are dispatched to the given object as messages.
 
     @automaton = VeryTinyStateMachine.new(:initialized, self)
-    @automaton.permit_state :processing, :closing, :closed
-    @automaton.permit_transition :initialized => :processing, :processing => :closing
-    @automaton.permit_transition :closing => :closed
+    @automaton.permit_states_and_transitions(:initialized => :processing, :processing => :closing, :closing => [:closed])
+    @automaton.permit_state :failed
+    @automaton.permit_transition :closing => :failed
     
     # Then, lower down the code
     @automaton.transition! :processing 

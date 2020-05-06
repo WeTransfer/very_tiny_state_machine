@@ -91,6 +91,31 @@ describe VeryTinyStateMachine do
     end
   end
 
+  describe '#permit_states_and_transitions' do
+    it 'accepts any states and sets up transitions' do
+      machine = described_class.new(:started)
+
+      same_machine = machine.permit_states_and_transitions(started: [:running, :overheat], running: [:stopped])
+
+      expect(same_machine).to eq(machine)
+      expect(machine.may_transition_to?(:running)).to eq(true)
+      expect(machine.may_transition_to?(:stopped)).to eq(false)
+
+      machine.transition! :running
+      expect(machine.may_transition_to?(:stopped)).to eq(true)
+      expect(machine.may_transition_to?(:overheat)).to eq(false)
+    end
+
+    it 'accepts same transitions and states multiple times' do
+      machine = described_class.new(:started)
+
+      machine.permit_states_and_transitions(started: [:running, :overheat], running: [:stopped])
+      machine.permit_states_and_transitions(started: [:running, :overheat], running: [:stopped])
+
+      expect(machine.may_transition_to?(:running)).to eq(true)
+    end
+  end
+
   describe '#flow_so_far' do
     it 'records the flow' do
       machine = described_class.new(:started)

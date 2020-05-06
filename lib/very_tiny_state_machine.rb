@@ -62,6 +62,24 @@ class VeryTinyStateMachine
     will_be_added
   end
 
+  # Permit states and transitions between them, all in one call
+  #
+  # @param **states_to_states [Hash] a mapping from one state the machine may go into and one or multiple states that can be reached from that state
+  # @return self
+  def permit_states_and_transitions(**initial_states_to_destination_states)
+    initial_states_to_destination_states.each_pair do |one_or_more_source_states, one_or_more_destination_states|
+      sources = Array(one_or_more_source_states)
+      destinations = Array(one_or_more_destination_states)
+      sources.each do |src|
+        destinations.each do |dest|
+          permit_state(src, dest)
+          permit_transition(src => dest)
+        end
+      end
+    end
+    self
+  end
+
   # Permit a transition from one state to another. If you need to add multiple transitions
   # from the same state, just call the method multiple times:
   #
