@@ -25,9 +25,9 @@ Gem::Specification.new do |s|
 
   s.specification_version = 4
   s.add_development_dependency('bundler')
-  s.add_development_dependency('rake', '~> 10')
-  s.add_development_dependency('rdoc', ['~> 3.12'])
-  s.add_development_dependency('rspec', ['~> 3.2.0'])
+  s.add_development_dependency('rake', '~> 12')
+  s.add_development_dependency('rdoc', ['~> 3'])
+  s.add_development_dependency('rspec', ['~> 3'])
   s.add_development_dependency('simplecov', ['~> 0.10'])
   s.add_development_dependency('wetransfer_style', '0.6.0') # Lock since we want to be backwards-compat down to Ruby 2.1
   s.add_development_dependency('yard')
